@@ -153,7 +153,7 @@ public class TokenSessionBO {
 			UserEntity userEntity = userDAO.findByEmail(email);
 			if (userEntity != null) {
 				if (password.equals(userEntity.getPassword())) {
-					userEntity.setIpAddress(httpRequest.getHeader("X-Forwarded-For"));
+					userEntity.setIpAddress(httpRequest.getRemoteAddr());
 					BanEntity banEntity = authenticationBO.checkUserBan(userEntity);
 
 					if (banEntity != null) {
