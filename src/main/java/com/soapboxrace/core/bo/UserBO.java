@@ -84,7 +84,7 @@ public class UserBO {
 			new SecureRandom().nextBytes(key);
 			userEntity.setVerifyToken(BaseEncoding.base16().lowerCase().encode(key));
 		}
-		userEntity.setIpAddress(request.getHeader("X-Forwarded-For"));
+		 userEntity.setIpAddress(Request.getRemoteAddr());
 		String xUA = request.getHeader("X-User-Agent");
 		userEntity.setUserAgent(xUA != null ? xUA : request.getHeader("User-Agent"));
 		userDao.insert(userEntity);
