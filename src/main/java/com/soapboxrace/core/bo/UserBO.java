@@ -96,7 +96,7 @@ public class UserBO {
 		LoginStatusVO loginStatusVO = new LoginStatusVO(0L, "", false);
 
 		if (parameterBO.getBoolParam("LEGACY_AUTH_DISABLE")) {
-			loginStatusVO.setDescription("This server requires launcher with Modern Auth support.");
+			loginStatusVO.setDescription("This server requires launcher with Modern Auth support. Please update your launcher.");
 			return loginStatusVO;
 		}
 
@@ -135,10 +135,11 @@ public class UserBO {
 				loginStatusVO.setDescription("Failed to send verification email!");
 				return loginStatusVO;
 			}
+		} else {
+			serverInfoDAO.updateNumberOfRegistered();
 		}
 		inviteTicketEntity.setUser(userEntity);
 		inviteTicketDAO.insert(inviteTicketEntity);
-		serverInfoDAO.updateNumberOfRegistered();
 		if (verifyEmail) {
 			loginStatusVO.setDescription("Account created! But before logging in, you need to verify your email.");
 			return loginStatusVO;
@@ -183,12 +184,13 @@ public class UserBO {
 			} catch (Exception e) {
 				throw new AuthException("Failed to send verification email!");
 			}
+		} else {
+			serverInfoDAO.updateNumberOfRegistered();
 		}
 		if (inviteTicketEntity != null) {
 			inviteTicketEntity.setUser(createdUser);
 			inviteTicketDAO.insert(inviteTicketEntity);
 		}
-		serverInfoDAO.updateNumberOfRegistered();
 
 		return verifyEmail;
 	}
@@ -226,6 +228,7 @@ public class UserBO {
 		}
 		user.setVerifyToken(null);
 		userDao.update(user);
+		serverInfoDAO.updateNumberOfRegistered();
 		return true;
 	}
 
