@@ -10,6 +10,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.MessageDigest;
 
@@ -32,9 +33,10 @@ public class OpenfireHook {
             return Response.status(Response.Status.BAD_REQUEST).entity("invalid token").build();
         }
         PersonaEntity personaEntity = personaDAO.findById(persona);
+        String response = null;
         if (personaEntity != null && personaEntity.getUser().isAdmin()) {
-            adminBO.sendChatCommand(persona, command);
+            response = adminBO.sendChatCommand(persona, command);
         }
-        return Response.noContent().build();
+        return Response.ok(response, MediaType.APPLICATION_JSON).build();
     }
 }

@@ -44,49 +44,45 @@ public class AdminBO {
 	@EJB
 	private ParameterBO parameterBO;
 
-	public void sendCommand(Long personaId, Long abuserPersonaId, String command)
+	public String sendChatCommand(Long personaId, String command)
 	{
+		String response = processChatCommand(personaId, command);
+		if (response != null) {
+			openFireSoapBoxCli.send(XmppChat.createSystemMessage(response), personaId);
+		}
+		return response;
 	}
 
-	public void sendChatCommand(Long personaId, String command)
+	private String processChatCommand(Long personaId, String command)
 	{
 		CommandInfo commandInfo = CommandInfo.parse(command, true);
-		if (commandInfo == null) return;
+		if (commandInfo == null) return null;
 
 		PersonaEntity personaEntity = personaDao.findByName(commandInfo.personaName);
-		if (personaEntity == null) {
-			openFireSoapBoxCli.send(XmppChat.createSystemMessage("Cannot find the user!"), personaId);
-			return;
-		}
+		if (personaEntity == null) return "Cannot find the user!";
 
 		switch (commandInfo.action)
 		{
 			case BAN:
 				if (banDAO.findByUser(personaEntity.getUser()) != null) {
-					openFireSoapBoxCli.send(XmppChat.createSystemMessage("User is already banned!"), personaId);
-					break;
+					return "User is already banned!";
 				}
 
 				sendBan(personaEntity, personaDao.findById(personaId), commandInfo.timeEnd, commandInfo.reason);
-				openFireSoapBoxCli.send(XmppChat.createSystemMessage("Banned user!"), personaId);
-				break;
+				return "Banned user!";
 			case KICK:
 				sendKick(personaEntity.getUser().getId(), personaEntity.getPersonaId());
-				openFireSoapBoxCli.send(XmppChat.createSystemMessage("Kicked user!"), personaId);
-				break;
+				return "Kicked user!";
 			case UNBAN:
 				BanEntity existingBan;
 				if ((existingBan = banDAO.findByUser(personaEntity.getUser())) == null) {
-					openFireSoapBoxCli.send(XmppChat.createSystemMessage("User is not banned!"), personaId);
-					break;
+					return "User is not banned!";
 				}
 
 				banDAO.delete(existingBan);
-				openFireSoapBoxCli.send(XmppChat.createSystemMessage("Unbanned user!"), personaId);
-
-				break;
+				return "Unbanned user!";
 			default:
-				break;
+				return null;
 		}
 	}
 

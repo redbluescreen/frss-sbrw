@@ -28,11 +28,7 @@ public class Social {
 	public String petition(@HeaderParam("securityToken") String securityToken, @QueryParam("personaId") Long personaId,
 			@QueryParam("abuserPersonaId") Long abuserPersonaId, @QueryParam("petitionType") Integer petitionType,
 			@QueryParam("description") String description, @QueryParam("customCarID") Integer customCarID, @QueryParam("chatMinutes") Integer chatMinutes) {
-		if (tokenSessionBo.isAdmin(securityToken) && description.startsWith("/")) {
-			adminBo.sendCommand(tokenSessionBo.getActivePersonaId(securityToken), abuserPersonaId, description);
-		} else {
-			bo.sendReport(personaId, abuserPersonaId, petitionType, description, customCarID, chatMinutes, 0L);
-		}
+		bo.sendReport(personaId, abuserPersonaId, petitionType, description, customCarID, chatMinutes, 0L);
 		return "";
 	}
 }
