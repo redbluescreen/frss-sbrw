@@ -93,6 +93,9 @@ public class AdminBO {
 		banEntity.setUserEntity(userEntity);
 		banEntity.setEndsAt(endsOn);
 		banEntity.setStarted(LocalDateTime.now());
+		if (reason == null) {
+			reason = parameterBO.getStrParam("DEFAULT_BAN_REASON");
+		}
 		banEntity.setReason(reason);
 		banEntity.setBannedBy(bannedBy);
 		banEntity.setHwid(userEntity.getGameHardwareHash());
