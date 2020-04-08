@@ -239,7 +239,8 @@ public class TokenSessionBO {
 
 		userEntity.setLastLogin(LocalDateTime.now());
         String xUA = request.getHeader("X-User-Agent");
-        userEntity.setUserAgent(xUA != null ? xUA : request.getHeader("User-Agent"));
+		String xUA2 = request.getHeader("X-UserAgent");
+        userEntity.setUserAgent(xUA != null ? xUA : (xUA2 != null ? xUA2 : request.getHeader("User-Agent")));
 		userDAO.update(userEntity);
 		analyticsBO.trackUserLogin(userEntity);
 
