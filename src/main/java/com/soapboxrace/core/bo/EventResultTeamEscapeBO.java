@@ -90,6 +90,9 @@ public class EventResultTeamEscapeBO {
 		eventDataEntity.setTopSpeed(teamEscapeArbitrationPacket.getTopSpeed());
 		eventDataDao.update(eventDataEntity);
 
+		boolean currentPersonaDidEvade = teamEscapeArbitrationPacket.getFinishReason() == 518 ||
+				teamEscapeArbitrationPacket.getFinishReason() == 22;
+
 		boolean anyoneEvaded = false;
 		ArrayOfTeamEscapeEntrantResult arrayOfTeamEscapeEntrantResult = new ArrayOfTeamEscapeEntrantResult();
 		for (EventDataEntity racer : eventDataDao.getRacers(eventSessionId)) {
@@ -110,7 +113,7 @@ public class EventResultTeamEscapeBO {
 			if (!racer.getPersonaId().equals(activePersonaId)) {
 				XmppEvent xmppEvent = new XmppEvent(racer.getPersonaId(), openFireSoapBoxCli);
 				xmppEvent.sendTeamEscapeEnd(teamEscapeEntrantResultResponse);
-				if (teamEscapeArbitrationPacket.getRank() == 1) {
+				if (currentPersonaDidEvade && teamEscapeArbitrationPacket.getRank() == 1) {
 					xmppEvent.sendEventTimingOut(eventSessionId);
 					timerManager.schedule(eventSessionId, racer.getPersonaId());
 				}
